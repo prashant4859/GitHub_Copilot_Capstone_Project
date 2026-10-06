@@ -2,7 +2,7 @@
 
 ## Source Metadata
 
-Source Type: MANUAL
+Source Type:
 Source ID:
 Source URL:
 Source Revision:
@@ -11,28 +11,28 @@ Title:
 
 ## Original User Story
 
-As a <user/persona>,
-I want <capability>,
-so that <business value>.
+Preserve the original user story content here.
 
 ## Original Acceptance Criteria
 
-1.
-2.
-3.
+Preserve all supplied acceptance criteria.
 
 ## Business Context
 
-Not provided.
+Preserve supplied business context.
 
 ## Additional Notes
 
-Not provided.
+Preserve relevant notes supplied by the source.
 
 ## Source Constraints
 
-Not provided.
+Preserve explicitly stated constraints.
 
 ## Attachments / References
 
-None.
+Preserve relevant references.
+
+## Source Content Not Mapped Elsewhere
+
+Preserve any meaningful source content that does not fit the sections above.

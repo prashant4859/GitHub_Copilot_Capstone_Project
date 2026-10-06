@@ -1,0 +1,5 @@
+# Agentic SDLC temporary/raw source material
+.sdlc/input/raw/*
+
+# Preserve directory
+!.sdlc/input/raw/.gitkeep
