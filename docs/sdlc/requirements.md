@@ -28,7 +28,7 @@ The business needs a way for registered users to maintain accurate account infor
 ## 3. User / Actor
 
 Primary actor: registered user.
-Secondary actor: profile/account data store.
+No additional business or external-system actors have been identified.
 
 ---
 
@@ -46,7 +46,8 @@ Allow a registered user to update their profile information and retain the lates
 - A registered user can edit their last name.
 - A registered user can edit their phone number.
 - A registered user can edit their mailing address.
-- The system validates required and optional fields.
+- Only the user's own profile can be updated.
+- The system validates required fields and supplied values.
 - The system stores valid updates.
 - The system shows a success or failure message.
 
@@ -54,9 +55,7 @@ Allow a registered user to update their profile information and retain the lates
 
 - Editing profile fields beyond first name, last name, phone number, and mailing address.
 - Additional authentication steps beyond the existing authentication state.
-- Admin-driven profile management or role-based exceptions.
-- Any external integrations, notifications, or reporting features.
-- Performance, availability, or scalability targets not stated in the source.
+- Updating another user's profile, including updates by privileged or administrative roles.
 
 ---
 
@@ -64,11 +63,14 @@ Allow a registered user to update their profile information and retain the lates
 
 | ID | Requirement | Source | Priority |
 |---|---|---|---|
-| FR-001 | The system shall allow a registered user to edit the user’s first name, last name, phone number, and mailing address. | Original User Story; RQ-001 | MUST |
-| FR-002 | The system shall require the user’s first name and last name to be provided before accepting a profile update. | RQ-002 | MUST |
-| FR-003 | The system shall validate the phone number format and accept only a valid 10-digit US phone number. | RQ-002 | MUST |
-| FR-004 | The system shall store the submitted profile values when all validation rules are satisfied. | Original Acceptance Criterion 2; RQ-002 | MUST |
-| FR-005 | The system shall display “Update Successful” after a successful profile update and “Update failed” after a failed profile update. | RQ-004 | MUST |
+| FR-001 | The system shall allow a registered user to update only the user's own first name, last name, phone number, and mailing address. | Original User Story; RQ-001; RQ-003 | MUST |
+| FR-002 | The system shall require first name and last name for a profile update. | RQ-002 | MUST |
+| FR-003 | The system shall allow phone number to be absent; when supplied, it shall accept only a valid 10-digit US phone number. | RQ-002 | MUST |
+| FR-004 | For the optional phone number and mailing address, the system shall clear a previously stored value when that field is explicitly submitted as blank in a successfully saved update, and retain the previously stored value when the field is omitted from the update request. | RQ-002; RQ-007 | MUST |
+| FR-005 | The system shall reject a profile update when a mandatory field is missing or a supplied value fails validation. | RQ-002 | MUST |
+| FR-006 | The system shall store profile values for a successfully processed update. | Original Acceptance Criterion 2; RQ-002 | MUST |
+| FR-007 | When validation fails or an update cannot be saved, the system shall leave the previously stored valid profile information unchanged. | RQ-004; RQ-005 | MUST |
+| FR-008 | The system shall display “Update Successful” after a successful update and “Update failed” when validation fails or the update cannot be saved. | RQ-004 | MUST |
 
 ---
 
@@ -76,12 +78,13 @@ Allow a registered user to update their profile information and retain the lates
 
 | ID | Related Requirement | Acceptance Criterion |
 |---|---|---|
-| AC-001 | FR-001 | When a registered user submits a profile update containing a first name, last name, phone number, and mailing address, the system shall accept the update request for validation. |
-| AC-002 | FR-002 | When a user submits a profile update with a missing first name or last name, the system shall reject the update and display “Update failed.” |
-| AC-003 | FR-003 | When a user submits a phone number that is not a valid 10-digit US phone number, the system shall reject the update and display “Update failed.” |
-| AC-004 | FR-004 | When a user submits a valid profile update, the system shall persist the updated values for the user’s account. |
-| AC-005 | FR-005 | When a valid profile update is processed successfully, the system shall display “Update Successful.” |
-| AC-006 | FR-005 | When a profile update cannot be processed, the system shall display “Update failed.” |
+| AC-001 | FR-001 | A registered user can submit changes to their own first name, last name, phone number, and mailing address; a request to update another user's profile, including one made by a privileged or administrative role, is rejected. |
+| AC-002 | FR-002, FR-005 | When first name or last name is missing, the system rejects the update and displays “Update failed.” |
+| AC-003 | FR-003, FR-005 | When phone number is absent, its absence alone does not cause rejection. When a supplied phone number is not a valid 10-digit US phone number, the system rejects the update and displays “Update failed.” |
+| AC-004 | FR-004 | When an optional phone number or mailing address is explicitly submitted as blank and the update is saved successfully, the system clears the previously stored value for that field. |
+| AC-005 | FR-004 | When an optional phone number or mailing address is omitted from the update request and the update is saved successfully, the system retains the previously stored value for that field. |
+| AC-006 | FR-006, FR-008 | When a valid update is saved successfully, the system persists the submitted profile values and displays “Update Successful.” |
+| AC-007 | FR-007, FR-008 | When validation fails or an update cannot be saved, the system displays “Update failed” and the previously stored valid profile information remains unchanged. |
 
 ---
 
@@ -90,9 +93,11 @@ Allow a registered user to update their profile information and retain the lates
 | ID | Business Rule | Source |
 |---|---|---|
 | BR-001 | A profile update shall include a first name and last name. | RQ-002 |
-| BR-002 | A profile update shall contain a valid 10-digit US phone number when a phone number is provided. | RQ-002 |
+| BR-002 | Phone number is optional; when provided, it must be a valid 10-digit US phone number. | RQ-002 |
 | BR-003 | Mailing address is optional. | RQ-002 |
-| BR-004 | No additional reauthentication is required for these profile fields. | RQ-003 |
+| BR-004 | A registered user may update only their own profile; updating another user's profile, including by privileged or administrative roles, is outside this story's scope. | RQ-003 |
+| BR-005 | No additional reauthentication is required to update the permitted profile fields. | RQ-006 |
+| BR-006 | A failed profile update shall not change previously stored valid profile information. | RQ-005 |
 
 ---
 
@@ -100,18 +105,18 @@ Allow a registered user to update their profile information and retain the lates
 
 | ID | Requirement | Classification | Source |
 |---|---|---|---|
-| DR-001 | The system shall store the user’s first name, last name, phone number, and mailing address when the submitted values satisfy the validation rules. | Required data | Original User Story; RQ-001; RQ-002 |
+| DR-001 | The system shall store the user's first name, last name, phone number, and mailing address when the submitted values satisfy the validation rules. | Profile data | Original User Story; RQ-001; RQ-002 |
 | DR-002 | The system shall treat first name and last name as mandatory fields for profile updates. | Required data | RQ-002 |
-| DR-003 | The system shall accept a phone number only when it matches a valid 10-digit US phone number format. | Data validation | RQ-002 |
-| DR-004 | The system shall allow the mailing address field to be empty. | Optional data | RQ-002 |
+| DR-003 | Phone number is optional; a supplied phone number must be a valid 10-digit US phone number. | Optional data; validation | RQ-002 |
+| DR-004 | Mailing address is optional. | Optional data | RQ-002 |
+| DR-005 | An unsuccessful update shall leave all previously stored valid profile information unchanged. | Data integrity | RQ-005 |
+| DR-006 | For optional phone number and mailing address, a successfully saved update shall clear a previously stored value when the field is explicitly submitted as blank, and retain the previously stored value when the field is omitted from the update request. | Optional data; update behavior | RQ-007 |
 
 ---
 
 ## 10. Integration Requirements
 
-| ID | Requirement | External System | Direction |
-|---|---|---|---|
-| IR-001 | No external integration is required for this story. | None specified | N/A |
+No external integration requirement has been identified from the source story or clarifications.
 
 ---
 
@@ -119,7 +124,8 @@ Allow a registered user to update their profile information and retain the lates
 
 | ID | Requirement | Source |
 |---|---|---|
-| SR-001 | The system shall not require additional reauthentication for a registered user updating the allowed profile fields. | RQ-003 |
+| SR-001 | A registered user may update only their own profile; updating another user's profile, including by privileged or administrative roles, is outside this story's scope. | RQ-003 |
+| SR-002 | The system shall not require additional reauthentication for updating the permitted profile fields. | RQ-006 |
 
 ---
 
@@ -127,47 +133,47 @@ Allow a registered user to update their profile information and retain the lates
 
 ### Performance
 
-No performance target is specified in the source. No quantitative performance requirement can be defined without business input.
+NOT_SPECIFIED
 
 ### Availability
 
-No availability target is specified in the source.
+NOT_SPECIFIED
 
 ### Scalability
 
-No scalability requirement is specified in the source.
+NOT_SPECIFIED
 
 ### Reliability
 
-No reliability target is specified in the source.
+NOT_SPECIFIED
 
 ### Security
 
-The only security-related requirement defined in the source is that no additional reauthentication is required for these profile fields.
+Specified security requirements are listed in Section 11. Other security non-functional criteria: NOT_SPECIFIED.
 
 ### Privacy
 
-No privacy requirement is specified for profile data handling or retention.
+NOT_SPECIFIED
 
 ### Accessibility
 
-No accessibility requirement is specified in the source.
+NOT_SPECIFIED
 
 ### Maintainability
 
-No maintainability requirement is specified in the source.
+NOT_SPECIFIED
 
 ### Observability
 
-No observability requirement is specified in the source.
+NOT_SPECIFIED
 
 ### Compatibility
 
-No compatibility requirement is specified in the source.
+NOT_SPECIFIED
 
 ### Compliance
 
-No compliance requirement is specified in the source.
+NOT_SPECIFIED
 
 ---
 
@@ -175,9 +181,9 @@ No compliance requirement is specified in the source.
 
 The system shall:
 - reject a profile update when first name or last name is missing
-- reject a profile update when the phone number is not a valid 10-digit US phone number
-- display “Update failed” when validation fails
-- display “Update failed” when the save operation fails
+- reject a profile update when a supplied value fails validation, including when a supplied phone number is not a valid 10-digit US phone number
+- display “Update failed” when validation fails or the update cannot be saved
+- leave previously stored valid profile information unchanged after a rejected or unsaved update
 - display “Update Successful” when the update is persisted successfully
 
 ---
@@ -200,7 +206,7 @@ No mandatory business, technical, legal, or organizational constraints are state
 
 | ID | Assumption | Reason | Approval Status |
 |---|---|---|---|
-| ASM-001 | No assumptions are recorded. | All blocking details required for testable requirements are provided by the clarified source. | N/A |
+| — | No assumptions recorded. | No assumptions have been approved. | N/A |
 
 ---
 
@@ -208,10 +214,13 @@ No mandatory business, technical, legal, or organizational constraints are state
 
 | Question ID | Question | Why It Matters | Blocking? | Answer | Status |
 |---|---|---|---|---|---|
-| RQ-001 | Which profile fields are editable by a registered user? | Defines the scope of the update and the required data model. | YES | Users can edit first name, last name, phone number and mailing address. | ANSWERED |
-| RQ-002 | What validation rules apply to profile data, and what happens when a submitted value is invalid or missing? | Defines required fields and validation behavior that are necessary for testable requirements. | YES | First and last name are mandatory. Phone number must be a valid 10-digit US phone number. Mailing address is optional. | ANSWERED |
-| RQ-003 | Is profile update restricted to the authenticated user’s own account, and are there any administrator or role-based exceptions? | Affects authorization and security requirements. | YES | No additional reauthentication is required for these fields. | ANSWERED |
-| RQ-004 | What user feedback is expected after a successful or failed profile update? | Defines acceptance criteria and user-visible behavior. | YES | For successful update display message “Update Successful”; for failed update display “Update failed”. | ANSWERED |
+| RQ-001 | Which profile fields are editable by a registered user? | Defines the scope of the update and the required data model. | YES | A registered user may update first name, last name, phone number, and mailing address. No other profile fields are editable as part of this story. | RESOLVED |
+| RQ-002 | Which profile fields are mandatory or optional, and what validation applies to supplied values? | Defines the data required for an update and the conditions under which it is accepted. | YES | First name and last name are mandatory. Phone number is optional, but when provided it must be a valid 10-digit US phone number. Mailing address is optional. If a mandatory field is missing or a supplied value fails validation, the update must be rejected. | RESOLVED |
+| RQ-003 | May a registered user update only their own profile, or may privileged or administrative roles update another user's profile? | Defines authorization scope and prevents out-of-scope access to another user's profile. | YES | A registered user may update only their own profile. Updating another user's profile, including by privileged or administrative roles, is outside the scope of this story. | RESOLVED |
+| RQ-004 | What user feedback is expected after a successful or failed profile update? | Defines observable outcomes and acceptance criteria. | YES | On successful update, display “Update Successful.” If validation fails or the update cannot be saved, display “Update failed.” | RESOLVED |
+| RQ-005 | What happens to previously stored valid profile information when validation fails or an update cannot be saved? | Defines data integrity and failure behavior. | YES | A failed update must leave the previously stored valid profile information unchanged. | RESOLVED |
+| RQ-006 | Is additional reauthentication required before updating the permitted profile fields? | Defines the authentication requirements for this action. | YES | No additional reauthentication is required. | RESOLVED |
+| RQ-007 | When an optional profile field is left blank, should a successful update clear any previously stored value for that field or retain the previous value? | Determines how successful updates affect existing data when optional fields are blank or omitted. | YES | If an optional profile field is explicitly submitted as blank in a successful update, the system shall clear the previously stored value for that field. If the optional field is not included in the update request, the system shall retain the previously stored value. | RESOLVED |
 
 ---
 
@@ -219,20 +228,28 @@ No mandatory business, technical, legal, or organizational constraints are state
 
 | Requirement | Source |
 |---|---|
-| FR-001 | Original User Story; RQ-001 |
+| FR-001 | Original User Story; RQ-001; RQ-003 |
 | FR-002 | RQ-002 |
 | FR-003 | RQ-002 |
-| FR-004 | Original Acceptance Criterion 2; RQ-002 |
-| FR-005 | RQ-004 |
+| FR-004 | RQ-002; RQ-007 |
+| FR-005 | RQ-002 |
+| FR-006 | Original Acceptance Criterion 2; RQ-002 |
+| FR-007 | RQ-004; RQ-005 |
+| FR-008 | RQ-004 |
 | DR-001 | Original User Story; RQ-001; RQ-002 |
 | DR-002 | RQ-002 |
 | DR-003 | RQ-002 |
 | DR-004 | RQ-002 |
+| DR-005 | RQ-005 |
+| DR-006 | RQ-007 |
 | SR-001 | RQ-003 |
+| SR-002 | RQ-006 |
 | BR-001 | RQ-002 |
 | BR-002 | RQ-002 |
 | BR-003 | RQ-002 |
 | BR-004 | RQ-003 |
+| BR-005 | RQ-006 |
+| BR-006 | RQ-005 |
 
 ---
 
@@ -240,17 +257,61 @@ No mandatory business, technical, legal, or organizational constraints are state
 
 | Requirement | Verification Method |
 |---|---|
-| FR-001 | Functional Test |
-| FR-002 | Functional Test |
+| FR-001 | Functional and Authorization Test |
+| FR-002 | Functional Validation Test |
 | FR-003 | Validation Test |
-| FR-004 | Functional Test |
-| FR-005 | UI Test |
+| FR-004 | Functional Update Test (explicit blank versus omitted optional field) |
+| FR-005 | Functional Validation Test |
+| FR-006 | Functional and Data Persistence Test |
+| FR-007 | Failure-path Data Integrity Test |
+| FR-008 | UI Test |
 | DR-001 | Data Validation Test |
 | DR-002 | Data Validation Test |
 | DR-003 | Data Validation Test |
 | DR-004 | Data Validation Test |
-| SR-001 | Security/Authorization Review |
+| DR-005 | Failure-path Data Integrity Test |
+| DR-006 | Data Update Test (explicit blank versus omitted optional field) |
+| SR-001 | Security/Authorization Test |
+| SR-002 | Security/Authentication Review |
 | BR-001 | Functional Test |
 | BR-002 | Validation Test |
 | BR-003 | Functional Test |
-| BR-004 | Security/Authorization Review |
+| BR-004 | Security/Authorization Test |
+| BR-005 | Security/Authentication Review |
+| BR-006 | Failure-path Data Integrity Test |
+
+---
+
+## 20. Open Issues
+
+No unresolved non-blocking issues have been identified.
+
+---
+
+## 21. Requirements Readiness Checklist
+
+| Check | Status |
+|---|---|
+| Business objective understood | PASS |
+| Actor identified | PASS |
+| Scope defined | PASS |
+| Functional requirements complete | PASS |
+| Acceptance criteria testable | PASS |
+| Error scenarios considered | PASS |
+| Data requirements considered | PASS |
+| Integration requirements considered | PASS |
+| Security requirements considered | PASS |
+| NFRs considered | PASS — unspecified NFRs are marked NOT_SPECIFIED |
+| Dependencies identified | PASS |
+| Constraints identified | PASS |
+| No unresolved blocking questions | PASS |
+| Requirements traceable | PASS |
+| Human approval received | APPROVED |
+
+---
+
+## 22. Final Status
+
+Requirements Status: APPROVED
+
+Human Approval: APPROVED
