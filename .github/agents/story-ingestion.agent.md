@@ -6,12 +6,9 @@ tools:
   - search
   - edit
   - execute
-  - atlassian/getJiraIssue
-  - atlassian/searchJiraIssuesUsingJql
-  - atlassian/getConfluenceContent
-  - atlassian/searchConfluence
+  - atlassian/*
 include-custom-instructions: true
-disable-model-invocation: true
+disable-model-invocation: false
 user-invocable: true
 ---
 

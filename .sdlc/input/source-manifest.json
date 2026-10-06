@@ -1,10 +1,10 @@
 {
-  "source_type": null,
-  "source_id": null,
-  "source_title": null,
-  "source_reference": null,
-  "source_revision": null,
-  "retrieved_at": null,
+  "status": "IMPORTED",
+  "source_title": "Update User Contact Information",
+  "source_id": "SCRUM-8",
   "normalized_file": ".sdlc/input/user-story.md",
-  "status": "NOT_IMPORTED"
+  "source_reference": "https://prashantchauhan4859.atlassian.net/browse/SCRUM-8",
+  "source_type": "JIRA",
+  "retrieved_at": "2026-10-07T01:01:18.812+05:30",
+  "source_revision": "2026-10-07T00:02:18.991+0530"
 }

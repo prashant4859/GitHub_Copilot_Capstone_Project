@@ -7,7 +7,7 @@ tools:
   - edit
   - execute
 include-custom-instructions: true
-disable-model-invocation: true
+disable-model-invocation: false
 user-invocable: true
 ---
 
