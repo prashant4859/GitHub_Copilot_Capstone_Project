@@ -5,8 +5,9 @@
 | Story/source identity | SCRUM-8 — Update User Contact Information; JIRA source revision `2026-10-07T00:02:18.991+0530` |
 | Requirements path and committed revision | `docs/sdlc/requirements.md`, committed at `da13f603f7050bd816cfc8cdaaf78339d74d4f40` |
 | Requirements approval | APPROVED at the recorded revision; human approval recorded 2026-10-07 |
+| Architecture revision | 1 |
 | Architecture status | READY_FOR_REVIEW |
-| Human approval status | PENDING |
+| Human approval status | APPROVED |
 
 Architecture for a greenfield SCRUM-8 prototype. The requirements baseline is approved and committed at the revision recorded above. Requirements reconciliation AQ-005 is resolved against that baseline; the architecture preserves the confirmed PATCH semantics and separately records the human-selected prototype stack and topology as architecture decisions. READY_FOR_REVIEW is not architecture approval. No implementation or deployment is part of this document.
 
